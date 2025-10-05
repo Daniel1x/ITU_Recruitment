@@ -1,12 +1,15 @@
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary> Represents a 2D grid-based map with configurable size and tile data. </summary>
 [System.Serializable]
 public class MapData
 {
     public event UnityAction OnMapDataChanged = null;
 
     [SerializeField] private Vector2Int mapSize = new Vector2Int(10, 10);
+
+    // The map is stored in a 1D array, where index = x + (y * width), 2D to 1D conversion, 2D array is not serializable in Unity
     [SerializeField] private TileType[] map = null;
 
     public Vector2Int Size => mapSize;
@@ -28,7 +31,7 @@ public class MapData
                 return default;
             }
 
-            return map[GetIndexFromGridPosition(_gridPosition)];
+            return map[GetIndex(_gridPosition)];
         }
         set
         {
@@ -37,7 +40,7 @@ public class MapData
                 return;
             }
 
-            int _index = GetIndexFromGridPosition(_gridPosition);
+            int _index = GetIndex(_gridPosition);
 
             if (map[_index] != value)
             {
@@ -54,11 +57,9 @@ public class MapData
         SetNewSize(_size, false);
     }
 
-    public int GetIndexFromGridPosition(Vector2Int _gridPosition)
-    {
-        return _gridPosition.x + (_gridPosition.y * mapSize.x);
-    }
+    public int GetIndex(Vector2Int _gridPosition) => _gridPosition.GetIndexFromGridPosition(mapSize);
 
+    /// <summary> Sets a new size for the map, preserving existing data where possible. </summary>
     public bool SetNewSize(Vector2Int _newSize, bool _callEvent = true)
     {
         if (_newSize.x <= 0

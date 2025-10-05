@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class CharacterMovementController : MonoBehaviour
 {
@@ -18,7 +17,7 @@ public class CharacterMovementController : MonoBehaviour
 
     private void OnDisable()
     {
-        stopMovement();
+        stopMovement(); // Ensure movement stops when the object is disabled and references are cleared
     }
 
     /// <summary> Moves the object along the specified path, invoking a callback upon completion. </summary>
@@ -65,7 +64,7 @@ public class CharacterMovementController : MonoBehaviour
 
                     if (_direction != Vector3.zero)
                     {
-                        _moveCharacter(Mathf.Min(_step, _direction.magnitude));
+                        moveCharacter(Mathf.Min(_step, _direction.magnitude), _direction);
                     }
 
                     continue;
@@ -78,17 +77,10 @@ public class CharacterMovementController : MonoBehaviour
             }
             else if (_direction != Vector3.zero)
             {
-                _moveCharacter(_step);
+                moveCharacter(_step, _direction);
             }
 
             yield return null;
-
-            void _moveCharacter(float _distance)
-            {
-                transform.position += _direction.normalized * _distance;
-                Quaternion _targetRotation = Quaternion.LookRotation(_direction.normalized);
-                transform.rotation = Quaternion.Slerp(transform.rotation, _targetRotation, rotationSpeed * Time.deltaTime);
-            }
         }
 
         if (characterAnimator != null)
@@ -100,6 +92,15 @@ public class CharacterMovementController : MonoBehaviour
         _onMovementComplete?.Invoke();
     }
 
+    /// <summary> Moves the character a specified distance in the current direction and updates its rotation. </summary>
+    private void moveCharacter(float _distance, Vector3 _direction)
+    {
+        transform.position += _direction.normalized * _distance;
+        Quaternion _targetRotation = Quaternion.LookRotation(_direction.normalized);
+        transform.rotation = Quaternion.Slerp(transform.rotation, _targetRotation, rotationSpeed * Time.deltaTime);
+    }
+
+    /// <summary> Stops any ongoing movement and clears the movement coroutine reference. </summary>
     private void stopMovement()
     {
         if (movementCoroutine != null)

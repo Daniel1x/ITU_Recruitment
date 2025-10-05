@@ -70,7 +70,7 @@ public class FreeCamera : MonoBehaviour
 
         if (inputProvider.Sprint)
         {
-            _movementScale *= sprintMultiplier;
+            _movementScale *= sprintMultiplier; // Increase speed when sprinting
         }
 
         _moveInput *= _movementScale;
@@ -100,8 +100,8 @@ public class FreeCamera : MonoBehaviour
         transform.Rotate(Vector3.up, _lookInput.x * rotationSpeed * Time.deltaTime, Space.World);
 
         Vector3 _angles = transform.eulerAngles;
-        float _currentPitch = _angles.x;
         float _pitchInput = -_lookInput.y * rotationSpeed * Time.deltaTime; // Invert Y for typical camera control
+        float _currentPitch = _angles.x;
 
         // Adjust for Unity's 0-360 degree representation
         if (_currentPitch > 180f)
@@ -120,6 +120,7 @@ public class FreeCamera : MonoBehaviour
         updateCameraLockState();
     }
 
+    // Updates the cursor lock state and visibility based on whether the camera is locked.
     private void updateCameraLockState()
     {
         Cursor.lockState = isCameraLockedAtPosition
@@ -129,6 +130,7 @@ public class FreeCamera : MonoBehaviour
         Cursor.visible = isCameraLockedAtPosition;
     }
 
+    /// <summary> Handles a mouse click event, determining whether the click is valid and invoking the appropriate action if so. </summary>
     private void handleMouseClick(bool _isLeftClick, InputAction.CallbackContext _context)
     {
         if (thisCamera == null
@@ -141,9 +143,9 @@ public class FreeCamera : MonoBehaviour
         Vector2 _mousePosition = _mouse.position.ReadValue();
         Vector2 _viewportPosition = thisCamera.ScreenToViewportPoint(_mousePosition);
 
-        if (ScreenClickValidator.IsAnyValidatorBlockingClick(thisCamera, _mousePosition, _viewportPosition))
+        if (ScreenClickValidator.IsClickBlocked(thisCamera, _mousePosition, _viewportPosition))
         {
-            return;
+            return; // Click is blocked by a validator
         }
 
         Ray _ray = thisCamera.ScreenPointToRay(_mousePosition);

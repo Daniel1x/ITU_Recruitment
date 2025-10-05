@@ -35,6 +35,13 @@ public class WorldSpaceTile : MonoBehaviour
         Node = null;
     }
 
+    public void SetTileData(Vector2Int _gridPosition, TileType _tileType)
+    {
+        GridPosition = _gridPosition;
+        Type = _tileType;
+        UpdateVisualization(_force: true);
+    }
+
     public void UpdateVisualization(bool _isInMovementRange = false, bool _isInAttackRange = false, bool _force = false)
     {
         if (_force == false
@@ -51,28 +58,6 @@ public class WorldSpaceTile : MonoBehaviour
 
     public void SetIsInMovementRange(bool _isInMovementRange) => UpdateVisualization(_isInMovementRange, IsInAttackRange);
     public void SetIsInAttackRange(bool _isInAttackRange) => UpdateVisualization(IsInMovementRange, _isInAttackRange);
-
-    public static WorldSpaceTile SetAsWorldSpaceTile(GameObject _object, Vector2Int _gridPosition, TileType _tileType)
-    {
-        if (_object == null)
-        {
-            return null; // Invalid object
-        }
-
-        WorldSpaceTile _tile = _object.GetComponent<WorldSpaceTile>();
-
-        if (_tile == null) //If component is not available, create a new one.
-        {
-            _tile = _object.AddComponent<WorldSpaceTile>();
-        }
-
-        // Assign setup data
-        _tile.GridPosition = _gridPosition;
-        _tile.Type = _tileType;
-        _tile.UpdateVisualization(_force: true);
-
-        return _tile;
-    }
 
     public static void PerformActionOnActiveTiles(System.Action<WorldSpaceTile> _action, bool _resetFlag)
     {

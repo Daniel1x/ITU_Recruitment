@@ -3,8 +3,10 @@ using UnityEngine;
 using UnityEngine.Events;
 using static MapRenderer.VisualizationSettings;
 
+/// <summary> Renders a grid-based map in the world using instanced drawing for performance, and provides pathfinding functionality. </summary>
 public class MapRenderer : MonoBehaviour, IPathfindingProvider
 {
+    /// <summary> Holds a group of tiles that share the same material and can be drawn together using instancing. </summary>
     [System.Serializable]
     public class TileGroup
     {
@@ -28,6 +30,7 @@ public class MapRenderer : MonoBehaviour, IPathfindingProvider
         }
     }
 
+    /// <summary> Holds groups of tiles categorized by their type and state (movement/attack range). </summary>
     [System.Serializable]
     public class TileTypeGroup
     {
@@ -91,9 +94,11 @@ public class MapRenderer : MonoBehaviour, IPathfindingProvider
         }
     }
 
+    /// <summary> Settings for visualizing the map tiles, including materials and colors for different tile types and states. </summary>
     [System.Serializable]
     public class VisualizationSettings : System.IDisposable
     {
+        /// <summary> Holds different material variations for a specific tile type based on its state (movement/attack range). </summary>
         [System.Serializable]
         public class MaterialGroup : System.IDisposable
         {
@@ -228,33 +233,6 @@ public class MapRenderer : MonoBehaviour, IPathfindingProvider
             cover = new MaterialGroup(tileMaterial, coverColor, movementRangeColor, attackRangeColor, coverTexture);
         }
 
-        public Material GetMaterial(TileType _type, bool _isInMovementRange, bool _isInAttackRange)
-        {
-            MaterialGroup _group = GetGroup(_type);
-
-            if (_group == null)
-            {
-                return null;
-            }
-
-            if (_isInMovementRange && _isInAttackRange)
-            {
-                return _group.Full;
-            }
-
-            if (_isInMovementRange)
-            {
-                return _group.ColorAndMovement;
-            }
-
-            if (_isInAttackRange)
-            {
-                return _group.ColorAndAttack;
-            }
-
-            return _group.OnlyColor;
-        }
-
         public MaterialGroup GetGroup(TileType _type)
         {
             return _type switch
@@ -305,6 +283,20 @@ public class MapRenderer : MonoBehaviour, IPathfindingProvider
         cover = new TileTypeGroup(settings.GetGroup(TileType.Cover));
     }
 
+    private void OnDestroy()
+    {
+        if (settings != null)
+        {
+            settings.Dispose();
+        }
+
+        if (Pathfinding != null)
+        {
+            Pathfinding.Dispose();
+            Pathfinding = null;
+        }
+    }
+
     private void OnEnable()
     {
         if (Map != null)
@@ -326,14 +318,6 @@ public class MapRenderer : MonoBehaviour, IPathfindingProvider
         if (mapData != null && mapData.IsValid)
         {
             onMapDataChanged();
-        }
-    }
-
-    private void OnDestroy()
-    {
-        if (settings != null)
-        {
-            settings.Dispose();
         }
     }
 
@@ -444,7 +428,7 @@ public class MapRenderer : MonoBehaviour, IPathfindingProvider
             for (int x = 0; x < Map.Width; x++)
             {
                 Vector2Int _gridPosition = new Vector2Int(x, y);
-                int _index = Map.GetIndexFromGridPosition(_gridPosition);
+                int _index = Map.GetIndex(_gridPosition);
                 WorldSpaceTile _tile = spawnedTiles[_index];
 
                 if (_tile == null)
@@ -452,10 +436,9 @@ public class MapRenderer : MonoBehaviour, IPathfindingProvider
                     continue;
                 }
 
-                TileType _type = Map[_gridPosition];
                 _tile.transform.position = _gridPosition.GetWorldPosition();
+                _tile.SetTileData(_gridPosition, Map[_gridPosition]);
                 _tile.gameObject.SetActive(true);
-                _tile = WorldSpaceTile.SetAsWorldSpaceTile(_tile.gameObject, _gridPosition, _type);
 
                 pathfindingGrid[x, y] = _tile;
             }

@@ -62,7 +62,7 @@ public class Pathfinding : System.IDisposable
         openSet.Add(_startNode);
 
         // Initialize the start node's score (G = 0, H = distance to target, 0 direction changes)
-        _startNode.Score = new AStarScore(0, MathExtensions.GetDistance(_startNode.GridPosition, _targetNode.GridPosition), 0);
+        _startNode.Score = new AStarScore(0, _startNode.GridPosition.GetDistance(_targetNode.GridPosition), 0);
 
         // Main A* loop: process nodes until the open queue is empty
         while (openQueue.Count > 0)
@@ -108,7 +108,7 @@ public class Pathfinding : System.IDisposable
                 // Calculate the new score for this neighbor
                 AStarScore _newScore = new AStarScore(
                     _g: _currentNodeScore.GCost + 1, // All neighbors are 1 step away
-                    _h: MathExtensions.GetDistance(_neighbour.GridPosition, _targetNode.GridPosition),
+                    _h: _neighbour.GridPosition.GetDistance(_targetNode.GridPosition),
                     _dirChange: _currentNodeScore.DirectionChangeCount + calculateDirectionChange(_currentNode, _neighbour, out int _directionAngle));
 
                 if (_movementRange >= 0 && _newScore.GCost > _movementRange)
@@ -181,7 +181,7 @@ public class Pathfinding : System.IDisposable
         return _path;
     }
 
-    /// <summary> Determines whether a direction change occurs between two hexagonal path nodes and calculates the resulting direction angle. </summary>
+    /// <summary> Determines whether a direction change occurs between two path nodes and calculates the resulting direction angle. </summary>
     private int calculateDirectionChange(PathNode _from, PathNode _to, out int _directionAngle)
     {
         if (_from.EnterDirectionAngle < 0f)
@@ -190,7 +190,7 @@ public class Pathfinding : System.IDisposable
             return 0; // No direction change on the first node
         }
 
-        Vector3 _dir = _to.Tile.transform.position - _from.Tile.transform.position;
+        Vector3 _dir = _to.Tile.WorldPosition - _from.Tile.WorldPosition;
         float _angle = Mathf.Atan2(_dir.x, _dir.z) * Mathf.Rad2Deg;
 
         _directionAngle = Mathf.RoundToInt(_angle);

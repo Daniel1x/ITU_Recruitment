@@ -71,7 +71,6 @@ public class PlayerSettingsMenu : RectTransformClickValidator
         {
             freeCamera.OnMouseClickAtGroundPosition += spawnCharacterAtTile;
         }
-
     }
 
     protected override void OnDisable()
@@ -208,33 +207,33 @@ public class PlayerSettingsMenu : RectTransformClickValidator
             || mapRenderer.Map.Width != _grid.GetLength(0)
             || mapRenderer.Map.Height != _grid.GetLength(1))
         {
-            return;
+            return; // Invalid grid or map size mismatch
         }
 
         Vector2Int _mapSize = mapRenderer.Map.Size;
-        _reassign(playerInstance, _mapSize, _grid);
+        reassignTile(playerInstance, _mapSize, _grid);
 
         for (int i = 0; i < spawnedEnemyInstances.Count; i++)
         {
-            _reassign(spawnedEnemyInstances[i], _mapSize, _grid);
+            reassignTile(spawnedEnemyInstances[i], _mapSize, _grid);
         }
+    }
 
-        void _reassign(GridObject _obj, Vector2Int _mapSize, WorldSpaceTile[,] pathfindingGrid)
+    private static void reassignTile(GridObject _obj, Vector2Int _mapSize, WorldSpaceTile[,] _grid)
+    {
+        if (_obj == null)
         {
-            if (_obj == null)
-            {
-                return;
-            }
-
-            Vector2Int _gridPos = _obj.transform.position.GetGridPosition();
-
-            if (!_gridPos.IsInGridBounds(_mapSize))
-            {
-                Destroy(_obj.gameObject);
-                return;
-            }
-
-            _obj.SetOccuipiedTile(pathfindingGrid[_gridPos.x, _gridPos.y]);
+            return;
         }
+
+        Vector2Int _gridPos = _obj.transform.position.GetGridPosition();
+
+        if (!_gridPos.IsInGridBounds(_mapSize))
+        {
+            Destroy(_obj.gameObject);
+            return;
+        }
+
+        _obj.SetOccuipiedTile(_grid[_gridPos.x, _gridPos.y]);
     }
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 
+/// <summary> Base class for objects that occupy tiles in a grid-based system. </summary>
 public class GridObject : MonoBehaviour
 {
     public Vector2Int GridPosition { get; protected set; } = Vector2Int.zero;

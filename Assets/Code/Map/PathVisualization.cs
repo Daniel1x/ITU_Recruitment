@@ -5,16 +5,18 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class PathVisualization : MonoBehaviour
 {
-    [SerializeField] private float yOffset = 0.1f;
+    [SerializeField] private Vector3 offset = new Vector3(0f, 0.1f, 0f);
 
-    private int validWaypointCount = 0;
-    private NativeArray<Vector3> waypoints;
-    private LineRenderer lineRenderer;
+    private LineRenderer lineRenderer = null;
+    private int validWaypointCount = 0; // Number of valid waypoints in the array
+    private NativeArray<Vector3> waypoints; // Preallocated array for waypoints
 
     private void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.positionCount = 0;
+
+        // Initial allocation of waypoints array, will resize if needed
         waypoints = new NativeArray<Vector3>(100, Allocator.Persistent);
     }
 
@@ -34,6 +36,7 @@ public class PathVisualization : MonoBehaviour
             return;
         }
 
+        // Resize waypoints array if necessary
         if (!waypoints.IsCreated || waypoints.Length < _path.Count)
         {
             if (waypoints.IsCreated)
@@ -45,26 +48,20 @@ public class PathVisualization : MonoBehaviour
             waypoints = new NativeArray<Vector3>(_newSize, Allocator.Persistent);
         }
 
-        Vector3 _offset = new Vector3(0f, yOffset, 0f);
         validWaypointCount = _path.Count;
 
         for (int i = 0; i < validWaypointCount; i++)
         {
-            waypoints[i] = _path[i].Tile.WorldPosition + _offset;
+            waypoints[i] = _path[i].Tile.WorldPosition + offset;
         }
 
-        updateLineRenderer();
-        gameObject.SetActive(true);
-    }
-
-    private void updateLineRenderer()
-    {
-        if (lineRenderer == null)
+        if (lineRenderer != null)
         {
-            return;
+            // Update LineRenderer with valid waypoints, using only the portion of the array that contains valid data
+            lineRenderer.positionCount = validWaypointCount;
+            lineRenderer.SetPositions(waypoints.GetSubArray(0, validWaypointCount));
         }
 
-        lineRenderer.positionCount = validWaypointCount;
-        lineRenderer.SetPositions(waypoints.GetSubArray(0, validWaypointCount));
+        gameObject.SetActive(true);
     }
 }

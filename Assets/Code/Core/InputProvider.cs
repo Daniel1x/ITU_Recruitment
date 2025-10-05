@@ -2,10 +2,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
+/// <summary> Provides input data and events to other game systems. </summary>
 public class InputProvider : MonoBehaviour
 {
-    private CustomInputActions inputActions = null;
-
     /// <summary> True if left click, false if right click. Additionally provides the InputAction.CallbackContext. </summary>
     public event UnityAction<bool, InputAction.CallbackContext> OnMouseClick = null;
 
@@ -13,6 +12,8 @@ public class InputProvider : MonoBehaviour
     public event UnityAction<bool> OnChagePage = null;
     public event UnityAction OnToggleCameraLock = null;
     public event UnityAction OnExit = null;
+
+    private CustomInputActions inputActions = null;
 
     public Vector2 Move => inputActions.Player.Move.ReadValue<Vector2>();
     public Vector2 Look => inputActions.Player.Look.ReadValue<Vector2>();

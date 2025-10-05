@@ -9,11 +9,8 @@ public class MapDataEditor : EditorWindow
     private Texture2D buttonTexture = null;
     private GUIStyle buttonStyle = null;
 
-    [MenuItem("Window/Map Data Editor")]
-    public static void ShowWindow()
-    {
-        GetWindow<MapDataEditor>("Map Data Editor");
-    }
+    [MenuItem("Tools/Map Data Editor")]
+    public static void ShowWindow() => GetWindow<MapDataEditor>("Map Data Editor");
 
     private void OnGUI()
     {
@@ -78,7 +75,7 @@ public class MapDataEditor : EditorWindow
         {
             buttonStyle = new GUIStyle(GUI.skin.button);
             buttonStyle.alignment = TextAnchor.MiddleCenter;            
-            buttonStyle.normal.textColor = Color.green;
+            buttonStyle.normal.textColor = Color.black;
         }
 
         buttonStyle.normal.background = _texture;

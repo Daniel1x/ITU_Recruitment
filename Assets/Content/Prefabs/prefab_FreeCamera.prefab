@@ -154,5 +154,5 @@ MonoBehaviour:
   maxY: 100
   movementSpeed: 10
   sprintMultiplier: 2
-  rotationSpeed: 30
+  rotationSpeed: 60
   inputProvider: {fileID: 0}

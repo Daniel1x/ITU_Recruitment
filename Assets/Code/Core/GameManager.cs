@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 
+/// <summary> Manages the overall game state and transitions between different modes of operation. </summary>
 public class GameManager : MonoBehaviour
 {
     public enum GameState
@@ -12,7 +13,7 @@ public class GameManager : MonoBehaviour
 
     private const string MAP_EDITING_INFO = "Click on map to change tiles";
     private const string UNIT_PLACEMENT_INFO = "Left-click to place player\nRight-click to place enemy";
-    private const string PATHFINDING_TESTING_INFO = "Pathfinding testing mode active.";
+    private const string PATHFINDING_TESTING_INFO = "Click on map to move player";
     private static readonly int STATE_COUNT = System.Enum.GetValues(typeof(GameState)).Length;
 
     [Header("References")]
@@ -72,6 +73,7 @@ public class GameManager : MonoBehaviour
         setNewState(_newState);
     }
 
+    /// <summary> Sets the new game state, handling transitions and UI updates. </summary>
     private void setNewState(GameState _newState, bool _force = false)
     {
         if (_newState == CurrentGameState && _force == false)

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary> Manages application-level actions such as reloading the level and quitting the application. </summary>
 public class ApplicationManager : ScreenClickValidator
 {
     [SerializeField] private InputProvider inputProvider = null;
